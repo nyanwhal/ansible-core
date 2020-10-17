@@ -1,0 +1,47 @@
+---
+
+# Keep this playbook as lean as possible. 
+# Handling of secrets or other complexity should be handed off 
+# to tasks in the repos being pulled here.
+
+- name: " Assemble core Ansible resources "
+  hosts: localhost
+  vars: 
+    source_file: import/sources.yml
+
+  vars_prompt: 
+    - name: git_user
+      prompt: " Enter your Git username " 
+      private: no 
+    - name: git_password 
+      prompt: " Enter your Git password " 
+      private: yes 
+
+  tasks:
+
+  - name: " Lookup source Git repositories in {{ source_file }} "
+    include_vars: 
+      file: "{{ source_file }}"
+      name: source_list
+
+  - name: " Pull source Git repositories "
+    git:
+      repo: "https://{{ git_user | urlencode }}:{{ git_password | urlencode }}@{{ item.value.repo }}.git"
+      version: "{{ item.value.branch }}"
+      dest:  "{{ item.value.path }}" 
+    loop: "{{ query('dict', source_list) }}"
+
+  - name: " Ensure remote URL in .git/conf does not contain credentials "
+    git_config:
+      name: remote.origin.url
+      value: https://{{ item.value.repo }}.git
+      scope: local
+      repo: "{{ item.value.path }}"
+    loop: "{{ query('dict', source_list) }}"
+
+  - name: " Run Ansible role core/main "
+    include_role:
+      name: core/main
+
+...
+
