@@ -142,6 +142,6 @@ by an established contributor of Ansible Galaxy content, about molecule for test
 
 ## Style guide
 
-The [Entisys360 Ansible style guide](https://github.com/nyanwhal/guidelines/ansible) is maintained in Github 
+The [Ansible style guide](https://github.com/nyanwhal/guidelines/ansible) is maintained in Github 
 with additional guidelines here in [docs/styleguide.md](./docs/styleguide.md).
 
